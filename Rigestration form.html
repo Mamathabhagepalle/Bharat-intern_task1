@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2023 by anonymous (http://jsbin.com/yopovoqagi/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>User Registration</title>
+<style id="jsbin-css">
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f2f2f2;
+}
+
+.container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+input {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+button {
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>User Registration</h1>
+    <form id="registrationForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="script.js"></script>
+<script id="jsbin-javascript">
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/your_database_name', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Create a user schema
+const userSchema = new mongoose.Schema({
+  username: String,
+  email: String,
+  password: String,
+});
+
+// Create a user model
+const User = mongoose.model('User', userSchema);
+
+// Middleware for parsing JSON
+app.use(bodyParser.json());
+
+// Serve HTML and CSS files
+app.use(express.static('public'));
+
+// Handle form submissions
+app.post('/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Create a new user
+    const newUser = new User({ username, email, password });
+
+    // Save the user to the database
+    await newUser.save();
+
+    res.send('Registration successful!');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+$(document).ready(function() {
+  $('#registrationForm').submit(function(e) {
+    e.preventDefault();
+
+    const username = $('#username').val();
+    const email = $('#email').val();
+    const password = $('#password').val();
+
+    // Send registration data to the server
+    $.ajax({
+      type: 'POST',
+      url: '/register',
+      contentType: 'application/json',
+      data: JSON.stringify({ username, email, password }),
+      success: function(response) {
+        alert(response);
+      },
+      error: function(error) {
+        console.error(error);
+        alert('Registration failed. Please try again.');
+      }
+    });
+  });
+});
+
+
+</script>
+</body>
+</html>
